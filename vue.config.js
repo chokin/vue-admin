@@ -20,13 +20,14 @@ module.exports = {
     // }
     Object.assign(config, {
       // 开发生产共同配置
-      // resolve: {
-      //   alias: {
-      //     '@': path.resolve(__dirname, './src'),
-      //     '@c': path.resolve(__dirname, './src/components'),
-      //     '@p': path.resolve(__dirname, './src/views')
-      //   } // 别名配置
-      // }
+      resolve: {
+        extensions:[".js",".json",".vue"],//自动添加文件名后缀
+        alias: {
+          '@': path.resolve(__dirname, './src'),
+          '@c': path.resolve(__dirname, './src/components'),
+          '@p': path.resolve(__dirname, './src/views')
+        } // 别名配置
+      }
     });
   },
   productionSourceMap: false, // 生产环境是否生成 sourceMap 文件
