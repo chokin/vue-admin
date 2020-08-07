@@ -37,72 +37,74 @@
 <script>
     //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
     //例如：import 《组件名称》 from '《组件路径》';
+    import { reactive,ref } from "@vue/composition-api";
     import { stripscript,chackMali } from "@/utils/validate"
     export default {
       //import引入的组件需要注入到对象中才能使用
-      components: {},
-      data() {       
-      
-        var validatePass1 = (rule, value, callback) => {
-            if (value === '') {
-                callback(new Error('请输入邮箱'));
-            }else if(!chackMali(value)){
-                callback(new Error('请输入正确格式的邮箱'));
-            } else {            
-                callback();
-            }
-        };
-        var validatePass2 = (rule, value, callback) => {
-            this.ruleForm.pass=stripscript(value)
-            value=this.ruleForm.pass
-            console.log(value);
-            let reg = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,12}$/
-            if (value === '') {
-                callback(new Error('请输入密码'));
-            }else if(!reg.test(value)){
-                callback(new Error('请输入6-20位的字母和数字'));
-            } else {            
-                callback();
-            }
-        };
-        var validatePass2_2 = (rule, value, callback) => {
-            this.ruleForm.pass2=stripscript(value)
-            value=this.ruleForm.pass2
 
-            if (value === '') {
-                callback(new Error('请输入密码'));
-            }else if(value!=this.ruleForm.pass){
-                callback(new Error('两次输入密码不一致，请重新输入'));
-            } else {            
-                callback();
-            }
-        };
-        var validatePass3 = (rule, value, callback) => {
-            this.ruleForm.verify=stripscript(value)
-            value=this.ruleForm.verify
-            let reg = /^[0-9A-Za-z]{6}$/
-            if (value === '') {
-                callback(new Error('请输入验证码'));
-            }else if(!reg.test(value)){
-                callback(new Error('请输入6位的验证码'));
-            } else {
-                callback();
-            }
-        };
-        //这里存放数据
-        return {
-            menuTab:[
+        setup(props,context){//这里放data数据，生命周期，自定义函数
+
+            var validatePass1 = (rule, value, callback) => {
+                console.log(123);
+                if (value === '') {
+                    callback(new Error('请输入邮箱'));
+                }else if(!chackMali(value)){
+                    callback(new Error('请输入正确格式的邮箱'));
+                } else {            
+                    callback();
+                }
+            };
+            var validatePass2 = (rule, value, callback) => {
+                ruleForm.pass=stripscript(value)
+                value=ruleForm.pass
+                console.log(value);
+                let reg = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,12}$/
+                if (value === '') {
+                    callback(new Error('请输入密码'));
+                }else if(!reg.test(value)){
+                    callback(new Error('请输入6-20位的字母和数字'));
+                } else {            
+                    callback();
+                }
+            };
+            var validatePass2_2 = (rule, value, callback) => {
+                ruleForm.pass2=stripscript(value)
+                value=ruleForm.pass2
+
+                if (value === '') {
+                    callback(new Error('请输入密码'));
+                }else if(value!=ruleForm.pass){
+                    callback(new Error('两次输入密码不一致，请重新输入'));
+                } else {            
+                    callback();
+                }
+            };
+            var validatePass3 = (rule, value, callback) => {
+                ruleForm.verify=stripscript(value)
+                value=ruleForm.verify
+                let reg = /^[0-9A-Za-z]{6}$/
+                if (value === '') {
+                    callback(new Error('请输入验证码'));
+                }else if(!reg.test(value)){
+                    callback(new Error('请输入6位的验证码'));
+                } else {
+                    callback();
+                }
+            };
+
+            const menuTab=reactive([
                 {text:"登录",current:true,model:"login"},
                 {text:"注册",current:false,model:"register"}
-            ],
-            model:"login",
-            ruleForm: {
+            ])
+            //这里表单的绑定数据
+            const ruleForm=reactive({
                 pass: '',
                 pass2: '',
                 username: '',
                 verify: ''
-            },
-            rules: {
+            })
+            //表单的验证
+            const rules=reactive({
                 username: [
                     { validator: validatePass1, trigger: 'blur' }
                 ],
@@ -116,10 +118,38 @@
                     { validator: validatePass3, trigger: 'blur' }
                 ],
             
-            }
-          
-        };
-      },
+            })
+            //模块值
+            const model=ref("login")
+            //声明函数
+            const togglemenu =(data=>{
+                menuTab.forEach(elem=>{
+                    elem.current=false
+                })
+                data.current=true
+                model.value=data.model
+            })
+            const submitForm=(formName=> {
+                context.refs[formName].validate((valid) => {
+                if (valid) {
+                    alert('submit!');
+                } else {
+                    console.log('error submit!!');
+                    return false;
+                }
+                });
+            })
+
+
+            return {menuTab,ruleForm,rules,model,togglemenu,submitForm,validatePass1}
+
+
+
+        },
+
+
+      components: {},
+  
       //监听属性 类似于data概念
       computed: {},
       //获取父组件的参数
@@ -128,26 +158,8 @@
       watch: {},
       //方法集合
       methods: {
-        togglemenu(data){
-            this.menuTab.forEach(elem=>{
-                elem.current=false
-            })
-            data.current=true
-            this.model=data.model
-        },
-        submitForm(formName) {
-            this.$refs[formName].validate((valid) => {
-            if (valid) {
-                alert('submit!');
-            } else {
-                console.log('error submit!!');
-                return false;
-            }
-            });
-        },
-        resetForm(formName) {
-            this.$refs[formName].resetFields();
-        }
+        
+        
 
 
 
